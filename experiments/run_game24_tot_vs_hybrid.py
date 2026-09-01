@@ -99,7 +99,7 @@ if str(_REPO_ROOT) not in sys.path:
 
 import numpy as np
 
-from metadyn.llm.openai_backend import OpenAIClient
+from basin.llm.openai_backend import OpenAIClient
 
 # ---------------------------------------------------------------------------
 # Paths & logging

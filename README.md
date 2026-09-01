@@ -114,7 +114,7 @@ a `summary.md` report) are written to `outputs/musr_lambda_sweep/` (override wit
 ## Repository structure
 
 ```
-metadyn/
+basin/
 ├── controller/metadynamics.py   # Core BASIN/QA-BASIN controller
 ├── memory/                      # Basin memory + clustering (embedding- and NLI-based)
 ├── state/                       # Reasoning-state representation and extraction

@@ -47,19 +47,19 @@ _REPO_ROOT = Path(__file__).parent.parent
 if str(_REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(_REPO_ROOT))
 
-from metadyn.confidence.estimator import AnswerResult, ConfidenceEstimator
-from metadyn.controller.candidate_gen import CandidateGenerator
-from metadyn.controller.metadynamics import MetadynamicsConfig, MetadynamicsController
-from metadyn.datasets.musr_loader import MuSRLoader, normalise_musr_answer
-from metadyn.datasets.loader import Problem
-from metadyn.embedding.sentence_transformer_backend import SentenceTransformerEmbedder
-from metadyn.llm.openai_backend import OpenAIClient
-from metadyn.memory.nli_basin_memory import NLIBasinMemory
-from metadyn.memory.nli_clustering import NLIBasinClusterer
-from metadyn.state.extractor import StateExtractor
-from metadyn.state.reasoning_state import ReasoningState
-from metadyn.state.structured_musr_extractor import StructuredMuSRExtractor
-from metadyn.verifier.verifier import HeuristicVerifier
+from basin.confidence.estimator import AnswerResult, ConfidenceEstimator
+from basin.controller.candidate_gen import CandidateGenerator
+from basin.controller.metadynamics import MetadynamicsConfig, MetadynamicsController
+from basin.datasets.musr_loader import MuSRLoader, normalise_musr_answer
+from basin.datasets.loader import Problem
+from basin.embedding.sentence_transformer_backend import SentenceTransformerEmbedder
+from basin.llm.openai_backend import OpenAIClient
+from basin.memory.nli_basin_memory import NLIBasinMemory
+from basin.memory.nli_clustering import NLIBasinClusterer
+from basin.state.extractor import StateExtractor
+from basin.state.reasoning_state import ReasoningState
+from basin.state.structured_musr_extractor import StructuredMuSRExtractor
+from basin.verifier.verifier import HeuristicVerifier
 
 # ---------------------------------------------------------------------------
 # Paths & logging
