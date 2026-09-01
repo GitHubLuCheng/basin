@@ -196,13 +196,6 @@ experiments/
 └── run_game24_mcts_qabasin.py      # MCTS table
 ```
 
-Trimmed to only what these five scripts actually import (verified by tracing the import
-graph and running every script end-to-end), matching exactly the tasks the paper's
-main-body tables report. Not included: BBH Logical Deduction, Graph-of-Thoughts, and the
-two post-hoc analysis figures — all appendix-table or figure-only content (see the table
-above) — or unused code from earlier prototyping (GSM8K, MATH, creative writing, unused
-verifier/embedding/LLM backends), none of which this repo's scripts need.
-
 ## Citation
 
 This paper is currently a preprint (not yet accepted at a venue). If you use
