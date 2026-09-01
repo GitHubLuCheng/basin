@@ -1,7 +1,7 @@
 # BASIN: Basin-Aware Search for Inference-Time LLM Reasoning
 
 Code to reproduce the two main-results tables from
-**"Escaping Reasoning Basins: Basin-Aware Search for Inference-Time LLM Reasoning."**
+**"Escaping Redundant Reasoning: Structure-Aware Search for Inference-Time LLMs"** (preprint).
 
 BASIN modifies candidate selection during tree-structured search (e.g. Tree-of-Thoughts)
 by penalizing candidates that fall into reasoning "basins" the search has already
@@ -21,7 +21,7 @@ This repository includes the code for the two headline tables:
 
 | Table | Task | Models | Script |
 |---|---|---|---|
-| Table 1 | Game of 24 | gpt-4o-mini, Qwen3-397b | `experiments/run_game24_tot_vs_hybrid.py` |
+| Table 1 | Game of 24 | gpt-4o-mini, Qwen3-27B | `experiments/run_game24_tot_vs_hybrid.py` |
 | Table 2/3 | MuSR | gpt-oss-120b, gpt-4o-mini | `experiments/run_musr_lambda_sweep.py` |
 
 Both scripts implement standard ToT search alongside the identical search with the
@@ -58,7 +58,7 @@ python experiments/run_game24_tot_vs_hybrid.py \
     --breadth 5 --beam_width 5 --depth 3 --lambda_ 3.0 \
     --start_idx 900 --end_idx 999
 
-# Qwen3-397b (or any other OpenAI-compatible endpoint) — point --base_url at your provider
+# Qwen3-27B (or any other OpenAI-compatible endpoint) — point --base_url at your provider
 python experiments/run_game24_tot_vs_hybrid.py \
     --api_key <PROVIDER_KEY> --base_url <PROVIDER_BASE_URL> \
     --model <MODEL_NAME> --methods tot_standard,tot_hybrid \
@@ -130,13 +130,15 @@ experiments/
 
 ## Citation
 
-If you use this code, please cite:
+This paper is currently a preprint (not yet accepted at a venue). If you use
+this code, please cite:
 
 ```bibtex
-@inproceedings{basin2026,
-  title     = {Escaping Reasoning Basins: Basin-Aware Search for Inference-Time LLM Reasoning},
-  booktitle = {Advances in Neural Information Processing Systems (NeurIPS)},
-  year      = {2026}
+@article{cheng2026basin,
+  title  = {Escaping Redundant Reasoning: Structure-Aware Search for Inference-Time LLMs},
+  author = {Cheng, Lu},
+  year   = {2026},
+  note   = {Preprint}
 }
 ```
 
