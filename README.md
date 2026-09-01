@@ -1,6 +1,6 @@
 # BASIN: Basin-Aware Search for Inference-Time LLM Reasoning
 
-Code to reproduce the two main-results tables from
+Code to reproduce the main-text results tables from
 **"Escaping Redundant Reasoning: Structure-Aware Search for Inference-Time LLMs"** (preprint).
 
 BASIN modifies candidate selection during tree-structured search (e.g. Tree-of-Thoughts)
@@ -17,16 +17,25 @@ which cluster of previously-explored reasoning states `s` belongs to, and `visit
 counts how many times that basin has been selected so far. Increasing `λ` increases the
 penalty on revisiting already-explored basins.
 
-This repository includes the code for the two headline tables:
+This repository includes the code for every table appearing in the main body of the
+paper (Sections 1–5, before the Appendix):
 
 | Table | Task | Models | Script |
 |---|---|---|---|
 | Table 1 | Game of 24 | gpt-4o-mini, Qwen3-27B | `experiments/run_game24_tot_vs_hybrid.py` |
 | Table 2/3 | MuSR | gpt-oss-120b, gpt-4o-mini | `experiments/run_musr_lambda_sweep.py` |
+| Table (Generalization) | HumanEval | gpt-4o-mini, gpt-oss-120b, Qwen2.5-7B-Instruct, Llama-3.3-70B-Instruct | `experiments/run_humaneval_tot_vs_basin.py` |
+| Table (Generalization) | GSM-Hard | gpt-4o-mini, gpt-oss-120b, Qwen2.5-7B-Instruct, Llama-3.3-70B-Instruct | `experiments/run_gsm_hard_tot_vs_hybrid.py` |
+| Table (MCTS) | Game of 24 (UCT-based MCTS) | gpt-4o-mini, gpt-oss-120b, Qwen2.5-7B-Instruct, Llama-3.3-70B-Instruct | `experiments/run_game24_mcts_qabasin.py` |
 
-Both scripts implement standard ToT search alongside the identical search with the
-BASIN penalty applied, under matched inference budgets, so the two conditions can be
-compared directly.
+All five scripts implement standard search alongside the identical search with the
+BASIN penalty applied (and, where the paper reports it, the quality-aware QA-BASIN
+variant, Eq. 6), under matched inference budgets, so the conditions can be compared
+directly. Not included: the Graph-of-Thoughts result (its full table lives in the
+Appendix, though headline numbers are stated in main-text prose), the two post-hoc
+analysis figures (collapse-stratified accuracy, the redundancy-gap routing diagnostic),
+and inline-only ablations (the Diverse-Beam-Search baseline, the quality-signal
+comparison, the temperature sweep) that don't have a dedicated main-body table.
 
 ## Setup
 
@@ -34,9 +43,9 @@ compared directly.
 pip install -r requirements.txt
 ```
 
-MuSR problems are loaded automatically via the HuggingFace `datasets` library on first
-run. Game of 24 puzzles are downloaded automatically from the standard
-`tree-of-thought-llm` benchmark CSV on first run.
+MuSR, HumanEval, and GSM-Hard problems are all loaded automatically via the HuggingFace
+`datasets` library on first run. Game of 24 puzzles are downloaded automatically from
+the standard `tree-of-thought-llm` benchmark CSV on first run.
 
 You'll need:
 - An API key for whichever LLM backend you use as the reasoning model (OpenAI, or any
@@ -111,24 +120,88 @@ Outputs (per-lambda aggregate accuracy/Pass@k/#Basins/N_eff, plus per-example re
 a `summary.md` report) are written to `outputs/musr_lambda_sweep/` (override with the
 `MUSR_SWEEP_OUTPUT_DIR` environment variable).
 
+## Reproducing the Generalization table (HumanEval, GSM-Hard)
+
+Both tasks use a free, deterministic verifier (test execution for HumanEval; exact
+arithmetic recomputation for GSM-Hard) instead of an LLM judge, and a structural basin
+key (AST-normalized parse tree for HumanEval; the tuple of exactly-verified intermediate
+values for GSM-Hard) instead of NLI clustering — so neither needs the extractor/NLI
+machinery MuSR does.
+
+```bash
+# HumanEval — full 164-problem test set
+python experiments/run_humaneval_tot_vs_basin.py \
+    --api_key <KEY> --backend openai --model gpt-4o-mini \
+    --n_examples 164 --lambdas 0.0 3.0 --include_qabasin --qa_lambda 0.5
+
+# GSM-Hard
+python experiments/run_gsm_hard_tot_vs_hybrid.py \
+    --api_key <KEY> --model gpt-4o-mini \
+    --n_examples 100 --lambda_basin 3.0 --include_qabasin --qa_lambda 0.5
+```
+
+`--backend {nrp,openai,together}` on the HumanEval script picks the base URL for you
+(pass `--base_url` directly to override); the GSM-Hard script takes `--base_url`
+directly (defaults to `https://api.openai.com/v1`). Both accept any of the paper's four
+model names via `--model`.
+
+**Safety note:** HumanEval evaluation executes model-generated code. This repo's
+`basin/verifier/code_executor.py` follows the standard HumanEval sandboxing pattern
+(subprocess isolation, wall-clock timeout, disabled filesystem/process syscalls) so that
+untrusted completions can't affect your machine — the same protections the original
+HumanEval release itself recommends running code generation benchmarks with.
+
+## Reproducing the MCTS table (Game of 24 with UCT-based MCTS)
+
+Same 100 puzzles (idx 900–999) as Table 1, but with UCT-based Monte Carlo Tree Search
+instead of ToT — the basin penalty is added directly to UCT's child-selection score,
+holding the exploration constant `c` and simulation budget fixed and identical across
+`mcts_standard`, `mcts_basin`, and `mcts_qabasin`:
+
+```bash
+python experiments/run_game24_mcts_qabasin.py \
+    --api_key <KEY> --base_url <PROVIDER_BASE_URL> --model gpt-4o-mini \
+    --c 1.0 --lambda_basin 3.0 --lambda_qa 0.5 \
+    --n_simulations 50 --n_proposals 5 --max_depth 3 \
+    --n_puzzles 100 --start_idx 900
+```
+
+This script always runs all three conditions (`mcts_standard`, `mcts_basin`,
+`mcts_qabasin`) in one invocation.
+
 ## Repository structure
 
 ```
 basin/
-├── controller/metadynamics.py   # Core BASIN/QA-BASIN controller
+├── controller/metadynamics.py   # Core BASIN/QA-BASIN controller (used by the MuSR script)
 ├── memory/                      # Basin memory + clustering (embedding- and NLI-based)
 ├── state/                       # Reasoning-state representation and extraction
 ├── embedding/                   # TF-IDF / sentence-transformer embedders
-├── verifier/                    # Heuristic verifier
+├── verifier/
+│   ├── verifier.py              # Heuristic verifier (MuSR/GoT-style tasks)
+│   ├── ast_basin.py             # AST-normalized structural basin key (HumanEval)
+│   └── code_executor.py         # Sandboxed test execution (HumanEval)
 ├── confidence/                  # Basin-weighted final-answer selection (internal to search; not a reported metric)
-├── datasets/                    # MuSR loader (Game of 24 downloads its own CSV directly in the script)
+├── datasets/
+│   ├── loader.py                # Shared Problem dataclass
+│   ├── musr_loader.py           # MuSR (HuggingFace `datasets`)
+│   ├── humaneval_loader.py      # HumanEval (HuggingFace `datasets`)
+│   └── gsm_hard_loader.py       # GSM-Hard (HuggingFace `datasets`)
 └── llm/                         # OpenAI-compatible LLM backend client
 experiments/
-├── run_game24_tot_vs_hybrid.py  # Table 1
-└── run_musr_lambda_sweep.py     # Table 2/3
+├── run_game24_tot_vs_hybrid.py     # Table 1
+├── run_musr_lambda_sweep.py        # Table 2/3
+├── run_humaneval_tot_vs_basin.py   # Generalization table (HumanEval)
+├── run_gsm_hard_tot_vs_hybrid.py   # Generalization table (GSM-Hard)
+└── run_game24_mcts_qabasin.py      # MCTS table
 ```
 
-Trimmed to only what these two scripts actually import (verified by tracing the import graph), matching the datasets the paper reports for its main results (Game of 24, MuSR) — this repo does not include loaders for datasets used elsewhere in the paper (HumanEval, GSM-Hard, BBH) or unused ones from earlier prototyping (GSM8K, MATH, creative writing), since those aren't part of the two main-results tables this repo reproduces.
+Trimmed to only what these five scripts actually import (verified by tracing the import
+graph and running every script end-to-end), matching exactly the tasks the paper's
+main-body tables report. Not included: BBH Logical Deduction, Graph-of-Thoughts, and the
+two post-hoc analysis figures — all appendix-table or figure-only content (see the table
+above) — or unused code from earlier prototyping (GSM8K, MATH, creative writing, unused
+verifier/embedding/LLM backends), none of which this repo's scripts need.
 
 ## Citation
 
