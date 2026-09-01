@@ -120,7 +120,7 @@ basin/
 ├── state/                       # Reasoning-state representation and extraction
 ├── embedding/                   # TF-IDF / sentence-transformer / n-gram embedders
 ├── verifier/                    # Heuristic and task-specific verifiers
-├── confidence/                  # Basin-weighted final-answer aggregation
+├── confidence/                  # Basin-weighted final-answer selection (internal to search; not a reported metric)
 ├── datasets/                    # Dataset loaders (MuSR, Game of 24, GSM8K, MATH)
 └── llm/                         # LLM backend clients (OpenAI-compatible, Anthropic)
 experiments/
