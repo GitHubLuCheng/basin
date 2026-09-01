@@ -118,15 +118,17 @@ basin/
 ├── controller/metadynamics.py   # Core BASIN/QA-BASIN controller
 ├── memory/                      # Basin memory + clustering (embedding- and NLI-based)
 ├── state/                       # Reasoning-state representation and extraction
-├── embedding/                   # TF-IDF / sentence-transformer / n-gram embedders
-├── verifier/                    # Heuristic and task-specific verifiers
+├── embedding/                   # TF-IDF / sentence-transformer embedders
+├── verifier/                    # Heuristic verifier
 ├── confidence/                  # Basin-weighted final-answer selection (internal to search; not a reported metric)
-├── datasets/                    # Dataset loaders (MuSR, Game of 24, GSM8K, MATH)
-└── llm/                         # LLM backend clients (OpenAI-compatible, Anthropic)
+├── datasets/                    # MuSR loader (Game of 24 downloads its own CSV directly in the script)
+└── llm/                         # OpenAI-compatible LLM backend client
 experiments/
 ├── run_game24_tot_vs_hybrid.py  # Table 1
 └── run_musr_lambda_sweep.py     # Table 2/3
 ```
+
+Trimmed to only what these two scripts actually import (verified by tracing the import graph), matching the datasets the paper reports for its main results (Game of 24, MuSR) — this repo does not include loaders for datasets used elsewhere in the paper (HumanEval, GSM-Hard, BBH) or unused ones from earlier prototyping (GSM8K, MATH, creative writing), since those aren't part of the two main-results tables this repo reproduces.
 
 ## Citation
 
