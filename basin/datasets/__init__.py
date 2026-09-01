@@ -1,3 +1,3 @@
-from .loader import Problem, DatasetLoader
+from .loader import Problem
 
-__all__ = ["Problem", "DatasetLoader"]
+__all__ = ["Problem"]

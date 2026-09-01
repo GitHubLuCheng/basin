@@ -540,7 +540,7 @@ def save_markdown(
     lambdas_sorted = sorted(aggregates.keys())
 
     lines = [
-        "# MuSR λ Sweep — MetaDynamics for Reasoning",
+        "# MuSR λ Sweep — BASIN",
         "",
         f"**Date:** {datetime.utcnow().strftime('%Y-%m-%d %H:%M UTC')}",
         f"**Dataset:** MuSR (n={cfg['n_examples']}, seed={cfg['seed']})",
@@ -735,7 +735,7 @@ def main():
     }
 
     logger.info("=" * 60)
-    logger.info("MuSR λ Sweep  —  MetaDynamics for Reasoning")
+    logger.info("MuSR λ Sweep  —  BASIN")
     logger.info("=" * 60)
     for k, v in cfg.items():
         logger.info("  %-28s %s", k, v)
