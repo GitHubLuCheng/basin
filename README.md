@@ -1,4 +1,4 @@
-# BASIN: Basin-Aware Search for Inference-Time LLM Reasoning
+# BASIN: Structure-Aware Search for Inference-Time LLMs
 
 Code to reproduce the main-text results tables from
 **"Escaping Redundant Reasoning: Structure-Aware Search for Inference-Time LLMs"** (preprint).
